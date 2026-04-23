@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Edad - Nutricionista</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 550px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .fecha-manual {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .fecha-manual input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .fecha-manual input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s ease;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        .resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 15px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .resultado.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .edad-principal {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .edad-anos {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .edad-anos span {
+            font-size: 20px;
+            font-weight: normal;
+            color: #718096;
+        }
+
+        .edad-meses {
+            font-size: 20px;
+            color: #4a5568;
+            margin-top: 5px;
+        }
+
+        .info-adicional {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .info-value {
+            color: #2d3748;
+        }
+
+        .recomendacion {
+            margin-top: 15px;
+            padding: 15px;
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2c5282;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 12px;
+            color: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚕️ Calculadora para Nely</h1>
+        <div class="subtitle">Ingreso manual rápido para nutricionistas</div>
+
+        <div class="input-group">
+            <label>📅 Fecha de nacimiento (DD/MM/AAAA)</label>
+            <div class="fecha-manual">
+                <input type="text" id="dia" placeholder="Día" maxlength="2" size="2">
+                <input type="text" id="mes" placeholder="Mes" maxlength="2" size="2">
+                <input type="text" id="anio" placeholder="Año" maxlength="4" size="4">
+            </div>
+        </div>
+
+        <button onclick="calcularEdadManual()">Calcular Edad Exacta</button>
+
+        <div id="resultado" class="resultado"></div>
+        <div id="error" class="error"></div>
+        <div class="footer">
+            Lo estos haciendo muy bien te amo.
+        </div>
+    </div>
+
+    <script>
+        // Auto-format: pasar al siguiente campo automáticamente
+        document.getElementById('dia').addEventListener('input', function(e) {
+            if(this.value.length === 2) document.getElementById('mes').focus();
+        });
+        
+        document.getElementById('mes').addEventListener('input', function(e) {
+            if(this.value.length === 2) document.getElementById('anio').focus();
+        });
+
+        function calcularEdadManual() {
+            const dia = document.getElementById('dia').value;
+            const mes = document.getElementById('mes').value;
+            const anio = document.getElementById('anio').value;
+            
+            const resultadoDiv = document.getElementById('resultado');
+            const errorDiv = document.getElementById('error');
+            
+            resultadoDiv.classList.remove('show');
+            errorDiv.classList.remove('show');
+            
+            // Validaciones
+            if(!dia || !mes || !anio) {
+                mostrarError('Completa día, mes y año');
+                return;
+            }
+            
+            const diaNum = parseInt(dia);
+            const mesNum = parseInt(mes);
+            const anioNum = parseInt(anio);
+            
+            if(diaNum < 1 || diaNum > 31) {
+                mostrarError('Día inválido (1-31)');
+                return;
+            }
+            
+            if(mesNum < 1 || mesNum > 12) {
+                mostrarError('Mes inválido (1-12)');
+                return;
+            }
+            
+            if(anioNum < 1900 || anioNum > new Date().getFullYear()) {
+                mostrarError('Año inválido (1900-actual)');
+                return;
+            }
+            
+            const fechaNac = new Date(anioNum, mesNum - 1, diaNum);
+            const hoy = new Date();
+            
+            // Validar fecha real
+            if(fechaNac.getDate() !== diaNum || fechaNac.getMonth() !== mesNum - 1) {
+                mostrarError('Fecha inválida (ej: 31/02 no existe)');
+                return;
+            }
+            
+            if(fechaNac > hoy) {
+                mostrarError('La fecha no puede ser futura');
+                return;
+            }
+            
+            // Cálculo de edad exacta
+            let años = hoy.getFullYear() - fechaNac.getFullYear();
+            let meses = hoy.getMonth() - fechaNac.getMonth();
+            let dias = hoy.getDate() - fechaNac.getDate();
+            
+            if(dias < 0) {
+                meses--;
+                const ultimoDiaMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth(), 0).getDate();
+                dias += ultimoDiaMesAnterior;
+            }
+            
+            if(meses < 0) {
+                años--;
+                meses += 12;
+            }
+            
+            const mesesTotales = años * 12 + meses;
+            const fechaCalculo = `${hoy.getDate().toString().padStart(2, '0')}/${(hoy.getMonth() + 1).toString().padStart(2, '0')}/${hoy.getFullYear()}`;
+            
+            // Recomendación nutricional
+            let recomendacion = '';
+            let colorRecomendacion = '';
+            
+            if(años < 2) {
+                recomendacion = '👶 **Lactante** - Control cada mes. Evaluar percentiles de peso/talla. Leche materna o fórmula como base.';
+                colorRecomendacion = '#fef5e7';
+            } else if(años < 12) {
+                recomendacion = '🧒 **Infancia** - Evaluar cada 3 meses. Proteínas: 1.2-1.5 g/kg/día. Vigilar curva de crecimiento.';
+                colorRecomendacion = '#e8f5e9';
+            } else if(años < 18) {
+                recomendacion = '🧑 **Adolescencia** - Aumento de requerimientos. Calcio: 1300 mg/día. Hierro: 11-15 mg/día según sexo.';
+                colorRecomendacion = '#e3f2fd';
+            } else if(años < 60) {
+                recomendacion = '👨‍⚕️ **Adulto** - Proteínas: 0.8-1.0 g/kg/día. Evaluar composición corporal cada año.';
+                colorRecomendacion = '#f3e5f5';
+            } else {
+                recomendacion = '👴 **Adulto mayor** - Prevenir sarcopenia. Proteínas: 1.2-1.5 g/kg/día. Vitamina D y calcio.';
+                colorRecomendacion = '#ffebee';
+            }
+            
+            resultadoDiv.innerHTML = `
+                <div class="edad-principal">
+                    <div class="edad-anos">
+                        ${años} <span>años</span>
+                    </div>
+                    <div class="edad-meses">
+                        ${meses} mes${meses !== 1 ? 'es' : ''} completos
+                    </div>
+                </div>
+                
+                <div class="info-adicional">
+                    <div class="info-item">
+                        <span class="info-label">📊 Meses de vida totales:</span>
+                        <span class="info-value">${mesesTotales} meses</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">📅 Fecha de cálculo:</span>
+                        <span class="info-value">${fechaCalculo}</span>
+                    </div>
+                </div>
+
+                <div class="recomendacion" style="background: ${colorRecomendacion}">
+                    <strong>🔬 Nota nutricionista:</strong><br>
+                    ${recomendacion}
+                </div>
+
+                <div style="margin-top: 15px; font-size: 13px; color: #718096; text-align: center; padding: 10px;">
+                    ⚕️ Cálculo exacto sin redondeos - Ideal para evaluaciones clínicas
+                </div>
+            `;
+            
+            resultadoDiv.classList.add('show');
+        }
+        
+        function mostrarError(mensaje) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.innerHTML = mensaje;
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>
