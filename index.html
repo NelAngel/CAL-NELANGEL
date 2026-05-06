@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Edad - Nutricionista</title>
+    <title>Calculadora Edad & IMC - Nutricionista</title>
     <style>
         * {
             margin: 0;
@@ -44,6 +44,24 @@
             font-size: 14px;
         }
 
+        .divider {
+            margin: 30px 0 20px;
+            border-top: 2px dashed #e2e8f0;
+            position: relative;
+        }
+
+        .divider span {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 15px;
+            color: #a0aec0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
         .input-group {
             margin-bottom: 25px;
         }
@@ -78,6 +96,28 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        /* Campos IMC */
+        .imc-campos {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .imc-campos input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .imc-campos input:focus {
+            outline: none;
+            border-color: #48bb78;
+            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+        }
+
         button {
             width: 100%;
             padding: 14px;
@@ -94,6 +134,11 @@
 
         button:hover {
             transform: scale(1.02);
+        }
+
+        .btn-imc {
+            background: linear-gradient(135deg, #48bb78 0%, #2f855a 100%);
+            margin-top: 5px;
         }
 
         .resultado {
@@ -183,6 +228,45 @@
             color: #2c5282;
         }
 
+        /* Estilos específicos para IMC */
+        .imc-valor {
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .imc-clasificacion {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .imc-tabla {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+
+        .imc-categoria {
+            flex: 1;
+            min-width: 70px;
+            padding: 6px 4px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #edf2f7;
+        }
+
+        .imc-categoria.activa {
+            transform: scale(1.02);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
         .error {
             background: #fed7d7;
             color: #c53030;
@@ -208,8 +292,9 @@
 <body>
     <div class="container">
         <h1>⚕️ Calculadora para Nely</h1>
-        <div class="subtitle">Ingreso manual</div>
+        <div class="subtitle">Edad exacta + Índice de Masa Corporal</div>
 
+        <!-- SECCIÓN EDAD -->
         <div class="input-group">
             <label>📅 Fecha de nacimiento (DD/MM/AAAA)</label>
             <div class="fecha-manual">
@@ -221,15 +306,34 @@
 
         <button onclick="calcularEdadManual()">Calcular Edad Exacta</button>
 
-        <div id="resultado" class="resultado"></div>
+        <div id="resultadoEdad" class="resultado"></div>
+
+        <!-- DIVISOR VISUAL -->
+        <div class="divider">
+            <span>➕</span>
+        </div>
+
+        <!-- SECCIÓN IMC -->
+        <div class="input-group">
+            <label>⚖️ Calculadora de IMC</label>
+            <div class="imc-campos">
+                <input type="number" id="peso" step="0.1" placeholder="Peso (kg)" value="">
+                <input type="number" id="altura" step="0.01" placeholder="Altura (m)" value="">
+            </div>
+        </div>
+
+        <button class="btn-imc" onclick="calcularIMC()">Calcular IMC</button>
+
+        <div id="resultadoIMC" class="resultado"></div>
         <div id="error" class="error"></div>
+        
         <div class="footer">
             Lo estas haciendo muy bien te amo.
         </div>
     </div>
 
     <script>
-        // Auto-format: pasar al siguiente campo automáticamente
+        // Auto-format: pasar al siguiente campo automáticamente en la fecha
         document.getElementById('dia').addEventListener('input', function(e) {
             if(this.value.length === 2) document.getElementById('mes').focus();
         });
@@ -238,12 +342,13 @@
             if(this.value.length === 2) document.getElementById('anio').focus();
         });
 
+        // ===================== CÁLCULO DE EDAD =====================
         function calcularEdadManual() {
             const dia = document.getElementById('dia').value;
             const mes = document.getElementById('mes').value;
             const anio = document.getElementById('anio').value;
             
-            const resultadoDiv = document.getElementById('resultado');
+            const resultadoDiv = document.getElementById('resultadoEdad');
             const errorDiv = document.getElementById('error');
             
             resultadoDiv.classList.remove('show');
@@ -307,7 +412,7 @@
             const mesesTotales = años * 12 + meses;
             const fechaCalculo = `${hoy.getDate().toString().padStart(2, '0')}/${(hoy.getMonth() + 1).toString().padStart(2, '0')}/${hoy.getFullYear()}`;
             
-            // Recomendación nutricional
+            // Recomendación nutricional según edad (con más detalle)
             let recomendacion = '';
             let colorRecomendacion = '';
             
@@ -335,6 +440,7 @@
                     </div>
                     <div class="edad-meses">
                         ${meses} mes${meses !== 1 ? 'es' : ''} completos
+                        ${dias > 0 ? ` + ${dias} día${dias !== 1 ? 's' : ''}` : ''}
                     </div>
                 </div>
                 
@@ -353,20 +459,181 @@
                     <strong>🔬 Nota nutricionista:</strong><br>
                     ${recomendacion}
                 </div>
-
-                <div style="margin-top: 15px; font-size: 13px; color: #718096; text-align: center; padding: 10px;">
-                </div>
             `;
             
             resultadoDiv.classList.add('show');
+        }
+        
+        // ===================== CÁLCULO IMC =====================
+        function calcularIMC() {
+            const pesoInput = document.getElementById('peso').value;
+            const alturaInput = document.getElementById('altura').value;
+            const resultadoIMCDiv = document.getElementById('resultadoIMC');
+            const errorDiv = document.getElementById('error');
+            
+            // Ocultar resultados previos
+            resultadoIMCDiv.classList.remove('show');
+            errorDiv.classList.remove('show');
+            
+            // Validaciones
+            if(pesoInput === '' || alturaInput === '') {
+                mostrarError('Ingresa peso y altura para calcular IMC');
+                return;
+            }
+            
+            const peso = parseFloat(pesoInput);
+            const altura = parseFloat(alturaInput);
+            
+            if(isNaN(peso) || isNaN(altura)) {
+                mostrarError('Valores no válidos');
+                return;
+            }
+            
+            if(peso <= 0 || peso > 500) {
+                mostrarError('Peso inválido (entre 1 y 500 kg)');
+                return;
+            }
+            
+            if(altura <= 0 || altura > 2.8) {
+                mostrarError('Altura inválida (entre 0.5 y 2.8 m)');
+                return;
+            }
+            
+            // Calcular IMC
+            const imc = peso / (altura * altura);
+            const imcRedondeado = imc.toFixed(1);
+            
+            // Determinar clasificación y consejo
+            let clasificacion = '';
+            let colorClasificacion = '';
+            let consejoNutricional = '';
+            let rangoPesoIdeal = '';
+            
+            // Clasificación OMS
+            if(imc < 18.5) {
+                clasificacion = 'Bajo peso';
+                colorClasificacion = '#fef5e7';
+                consejoNutricional = '🍎 Se recomienda aumentar peso de forma saludable: incorporar frutos secos, aguacate, proteínas magras y realizar entrenamiento de fuerza.';
+                rangoPesoIdeal = `Para llegar a un IMC normal (18.5-24.9), deberías aumentar aprox. ${((18.5 * altura * altura) - peso).toFixed(1)} - ${((24.9 * altura * altura) - peso).toFixed(1)} kg.`;
+            } 
+            else if(imc >= 18.5 && imc < 25) {
+                clasificacion = 'Peso normal ✅';
+                colorClasificacion = '#e8f5e9';
+                consejoNutricional = '🥗 ¡Excelente! Mantén hábitos saludables: dieta equilibrada, actividad física regular y chequeos periódicos.';
+                rangoPesoIdeal = 'Tu peso está dentro del rango saludable. Sigue así.';
+            }
+            else if(imc >= 25 && imc < 30) {
+                clasificacion = 'Sobrepeso';
+                colorClasificacion = '#fff3e0';
+                consejoNutricional = '🏃‍♂️ Se recomienda reducir entre 5-10% del peso actual. Priorizar vegetales, proteínas magras, reducir azúcares y aumentar actividad física.';
+                rangoPesoIdeal = `Para un IMC normal, tu peso ideal estaría entre ${(18.5 * altura * altura).toFixed(1)} kg y ${(24.9 * altura * altura).toFixed(1)} kg.`;
+            }
+            else if(imc >= 30 && imc < 35) {
+                clasificacion = 'Obesidad tipo I';
+                colorClasificacion = '#ffebee';
+                consejoNutricional = '⚠️ Es importante acudir con nutricionista. Disminuir calorías gradualmente (500 kcal/día), aumentar fibra y realizar ejercicio aeróbico 150 min/semana.';
+                rangoPesoIdeal = `Sugerencia de peso saludable: ${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg.`;
+            }
+            else if(imc >= 35 && imc < 40) {
+                clasificacion = 'Obesidad tipo II';
+                colorClasificacion = '#ffcdd2';
+                consejoNutricional = '🩺 Obesidad severa. Requiere evaluación médica y nutricional personalizada. Priorizar cambios conductuales y supervisión profesional.';
+                rangoPesoIdeal = `Meta sugerida: reducir al menos un 10% del peso actual. Rango saludable: ${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg.`;
+            }
+            else {
+                clasificacion = 'Obesidad tipo III (mórbida)';
+                colorClasificacion = '#ef9a9a';
+                consejoNutricional = '🚨 Atención prioritaria. Tratamiento multidisciplinario urgente: nutrición, endocrinología y actividad física adaptada.';
+                rangoPesoIdeal = `Objetivo a largo plazo alcanzar rango de ${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg con acompañamiento profesional.`;
+            }
+            
+            // Determinar color de fondo dinámico para el valor de IMC
+            let colorIMC = '';
+            if(imc < 18.5) colorIMC = '#f6ad55';
+            else if(imc < 25) colorIMC = '#68d391';
+            else if(imc < 30) colorIMC = '#fbd38d';
+            else colorIMC = '#fc8181';
+            
+            // Construir tabla visual de categorías IMC
+            const categorias = [
+                { nombre: 'Bajo peso', min: 0, max: 18.4 },
+                { nombre: 'Normal', min: 18.5, max: 24.9 },
+                { nombre: 'Sobrepeso', min: 25, max: 29.9 },
+                { nombre: 'Obesidad I', min: 30, max: 34.9 },
+                { nombre: 'Obesidad II', min: 35, max: 39.9 },
+                { nombre: 'Obesidad III', min: 40, max: 100 }
+            ];
+            
+            let tablaHTML = '<div class="imc-tabla">';
+            categorias.forEach(cat => {
+                let activa = (imc >= cat.min && imc <= cat.max);
+                let colorFondo = '#edf2f7';
+                if(activa) {
+                    if(cat.nombre === 'Bajo peso') colorFondo = '#f6ad55';
+                    else if(cat.nombre === 'Normal') colorFondo = '#68d391';
+                    else if(cat.nombre === 'Sobrepeso') colorFondo = '#fbd38d';
+                    else colorFondo = '#fc8181';
+                }
+                tablaHTML += `<div class="imc-categoria" style="background: ${colorFondo}; ${activa ? 'border: 2px solid #2d3748; font-weight: bold;' : ''}">${cat.nombre}<br><small>${cat.min}-${cat.max}</small></div>`;
+            });
+            tablaHTML += '</div>';
+            
+            resultadoIMCDiv.innerHTML = `
+                <div style="text-align: center;">
+                    <div class="imc-valor" style="color: ${colorIMC};">${imcRedondeado}</div>
+                    <div class="imc-clasificacion" style="color: #2d3748;">${clasificacion}</div>
+                </div>
+                
+                ${tablaHTML}
+                
+                <div class="info-adicional" style="margin-top: 5px;">
+                    <div class="info-item">
+                        <span class="info-label">⚖️ Peso ingresado:</span>
+                        <span class="info-value">${peso} kg</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">📏 Altura:</span>
+                        <span class="info-value">${altura} m</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">🎯 Rango saludable:</span>
+                        <span class="info-value">${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg</span>
+                    </div>
+                </div>
+
+                <div class="recomendacion" style="background: ${colorClasificacion}; border-left-color: #2c5282;">
+                    <strong>📌 Consejo nutricional:</strong><br>
+                    ${consejoNutricional}<br><br>
+                    <small>📊 ${rangoPesoIdeal}</small>
+                </div>
+                
+                <div style="margin-top: 12px; font-size: 12px; color: #718096; text-align: center;">
+                    Basado en criterios OMS · Consulta siempre a un especialista
+                </div>
+            `;
+            
+            resultadoIMCDiv.classList.add('show');
         }
         
         function mostrarError(mensaje) {
             const errorDiv = document.getElementById('error');
             errorDiv.innerHTML = mensaje;
             errorDiv.classList.add('show');
-            setTimeout(() => errorDiv.classList.remove('show'), 3000);
+            setTimeout(() => errorDiv.classList.remove('show'), 3500);
         }
+        
+        // Bonus: Si el usuario presiona Enter mientras está en los campos de IMC también se calcula
+        document.getElementById('peso').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') calcularIMC();
+        });
+        document.getElementById('altura').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') calcularIMC();
+        });
+        
+        // También permitir enter en campos fecha
+        document.getElementById('anio').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') calcularEdadManual();
+        });
     </script>
 </body>
 </html>
