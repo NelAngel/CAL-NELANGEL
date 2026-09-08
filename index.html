@@ -1,639 +1,1313 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Edad & IMC - Nutricionista</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora Nutricional + Pacientes</title>
+  <style>
+    /* ===== RESET Y BASE ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 30px 20px;
+    }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 40px;
-            max-width: 550px;
-            width: 100%;
-        }
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+      max-width: 1100px;
+      width: 100%;
+      margin-top: 20px;
+    }
 
-        h1 {
-            color: #2d3748;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
+    h1 {
+      color: #2d3748;
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
 
-        .subtitle {
-            text-align: center;
-            color: #718096;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
+    .subtitle {
+      text-align: center;
+      color: #718096;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
 
-        .divider {
-            margin: 30px 0 20px;
-            border-top: 2px dashed #e2e8f0;
-            position: relative;
-        }
+    /* ===== PESTAÑAS ===== */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+    .tab-btn {
+      padding: 10px 20px;
+      background: transparent;
+      border: none;
+      border-radius: 8px 8px 0 0;
+      font-weight: 600;
+      color: #718096;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 15px;
+    }
+    .tab-btn:hover {
+      background: #edf2f7;
+    }
+    .tab-btn.active {
+      background: #667eea;
+      color: white;
+    }
+    .tab-content {
+      display: block;
+    }
+    .tab-content[style*="display:none"] {
+      display: none;
+    }
 
-        .divider span {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            padding: 0 15px;
-            color: #a0aec0;
-            font-size: 14px;
-            font-weight: 600;
-        }
+    /* ===== ESTILOS EXISTENTES (calculadora) ===== */
+    .divider {
+      margin: 30px 0 20px;
+      border-top: 2px dashed #e2e8f0;
+      position: relative;
+    }
+    .divider span {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 0 15px;
+      color: #a0aec0;
+      font-size: 14px;
+      font-weight: 600;
+    }
 
-        .input-group {
-            margin-bottom: 25px;
-        }
+    .input-group {
+      margin-bottom: 25px;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #4a5568;
-            font-weight: 600;
-            font-size: 14px;
-        }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #4a5568;
+      font-weight: 600;
+      font-size: 14px;
+    }
 
-        .fecha-manual {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+    .fecha-manual {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .fecha-manual input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      min-width: 60px;
+    }
+    .fecha-manual input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
 
-        .fecha-manual input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 16px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
+    .imc-campos {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .imc-campos input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+    .imc-campos input:focus {
+      outline: none;
+      border-color: #48bb78;
+      box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+    }
 
-        .fecha-manual input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
+    .sexo-group {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .sexo-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      color: #2d3748;
+      cursor: pointer;
+    }
+    .sexo-group input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #667eea;
+      cursor: pointer;
+    }
 
-        /* Campos IMC */
-        .imc-campos {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+    button {
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: transform 0.2s ease;
+      width: 100%;
+    }
+    button:hover {
+      transform: scale(1.02);
+    }
+    .btn-imc {
+      background: linear-gradient(135deg, #48bb78 0%, #2f855a 100%);
+      margin-top: 5px;
+    }
 
-        .imc-campos input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
+    .resultado {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f7fafc;
+      border-radius: 15px;
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    .resultado.show {
+      display: block;
+    }
 
-        .imc-campos input:focus {
-            outline: none;
-            border-color: #48bb78;
-            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
-        }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-        button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: transform 0.2s ease;
-        }
+    .edad-principal {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .edad-anos {
+      font-size: 48px;
+      font-weight: bold;
+      color: #2d3748;
+    }
+    .edad-anos span {
+      font-size: 20px;
+      font-weight: normal;
+      color: #718096;
+    }
+    .edad-meses {
+      font-size: 20px;
+      color: #4a5568;
+      margin-top: 5px;
+    }
 
-        button:hover {
-            transform: scale(1.02);
-        }
+    .info-adicional {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+    }
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .info-item:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-weight: 600;
+      color: #4a5568;
+    }
+    .info-value {
+      color: #2d3748;
+    }
 
-        .btn-imc {
-            background: linear-gradient(135deg, #48bb78 0%, #2f855a 100%);
-            margin-top: 5px;
-        }
+    .recomendacion {
+      margin-top: 15px;
+      padding: 15px;
+      background: #ebf8ff;
+      border-left: 4px solid #4299e1;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #2c5282;
+    }
 
-        .resultado {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f7fafc;
-            border-radius: 15px;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
+    .imc-valor {
+      font-size: 36px;
+      font-weight: bold;
+      text-align: center;
+      margin: 10px 0;
+    }
+    .imc-clasificacion {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    .imc-tabla {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 15px 0;
+      justify-content: center;
+    }
+    .imc-categoria {
+      flex: 1;
+      min-width: 70px;
+      padding: 6px 4px;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #edf2f7;
+    }
+    .imc-categoria.activa {
+      transform: scale(1.02);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 
-        .resultado.show {
-            display: block;
-        }
+    .pesos-extra {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px dashed #e2e8f0;
+    }
+    .peso-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      text-align: center;
+      border: 1px solid #edf2f7;
+      transition: 0.2s;
+    }
+    .peso-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .peso-card .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #718096;
+      font-weight: 600;
+    }
+    .peso-card .value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2d3748;
+      margin-top: 4px;
+    }
+    .peso-card .sub {
+      font-size: 12px;
+      color: #a0aec0;
+      margin-top: 2px;
+    }
+    .peso-card.west .value {
+      color: #3182ce;
+    }
+    .peso-card.broca .value {
+      color: #38a169;
+    }
+    .peso-card.wilkens .value {
+      color: #d69e2e;
+    }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .error {
+      background: #fed7d7;
+      color: #c53030;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+    .error.show {
+      display: block;
+    }
 
-        .edad-principal {
-            text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e2e8f0;
-        }
+    .footer {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 12px;
+      color: #a0aec0;
+    }
 
-        .edad-anos {
-            font-size: 48px;
-            font-weight: bold;
-            color: #2d3748;
-        }
+    /* ===== TABLA DE PACIENTES ===== */
+    .tabla-wrapper {
+      overflow-x: auto;
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    #tablaPacientes {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      font-size: 14px;
+    }
+    #tablaPacientes thead {
+      background: #667eea;
+      color: white;
+    }
+    #tablaPacientes th {
+      padding: 12px 8px;
+      text-align: left;
+      font-weight: 600;
+    }
+    #tablaPacientes td {
+      padding: 8px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+    #tablaPacientes tr:last-child td {
+      border-bottom: none;
+    }
 
-        .edad-anos span {
-            font-size: 20px;
-            font-weight: normal;
-            color: #718096;
-        }
+    .btn-eliminar {
+      background: #fc8181;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+      width: auto;
+      margin: 0;
+    }
+    .btn-eliminar:hover {
+      background: #e53e3e;
+    }
 
-        .edad-meses {
-            font-size: 20px;
-            color: #4a5568;
-            margin-top: 5px;
-        }
+    .btn-editar {
+      background: #4299e1;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+      width: auto;
+      margin: 0;
+    }
+    .btn-editar:hover {
+      background: #3182ce;
+    }
 
-        .info-adicional {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
+    .btn-guardar-edicion {
+      background: #48bb78;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+      width: auto;
+      margin: 0;
+    }
+    .btn-guardar-edicion:hover {
+      background: #38a169;
+    }
 
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
+    .btn-cancelar-edicion {
+      background: #a0aec0;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+      width: auto;
+      margin: 0;
+      margin-left: 4px;
+    }
+    .btn-cancelar-edicion:hover {
+      background: #718096;
+    }
 
-        .info-item:last-child {
-            border-bottom: none;
-        }
+    .btn-agregar,
+    .btn-buscar,
+    .btn-todos {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      width: auto;
+      margin-top: 0;
+    }
+    .btn-agregar {
+      background: #48bb78;
+      color: white;
+    }
+    .btn-agregar:hover {
+      background: #38a169;
+    }
+    .btn-buscar {
+      background: #4299e1;
+      color: white;
+    }
+    .btn-buscar:hover {
+      background: #3182ce;
+    }
+    .btn-todos {
+      background: #a0aec0;
+      color: white;
+    }
+    .btn-todos:hover {
+      background: #718096;
+    }
 
-        .info-label {
-            font-weight: 600;
-            color: #4a5568;
-        }
+    .campo-filtro {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .campo-filtro input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      min-width: 120px;
+    }
+    .campo-filtro input:focus {
+      outline: none;
+      border-color: #4299e1;
+    }
 
-        .info-value {
-            color: #2d3748;
-        }
+    /* Estilo para campos de edición */
+    .edit-input {
+      background: #fffff0;
+      border: 2px solid #4299e1;
+      border-radius: 6px;
+      padding: 4px 6px;
+      width: 100%;
+      min-width: 80px;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+    .edit-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
 
-        .recomendacion {
-            margin-top: 15px;
-            padding: 15px;
-            background: #ebf8ff;
-            border-left: 4px solid #4299e1;
-            border-radius: 8px;
-            font-size: 14px;
-            line-height: 1.5;
-            color: #2c5282;
-        }
+    .texto-normal {
+      padding: 4px 6px;
+      display: block;
+    }
 
-        /* Estilos específicos para IMC */
-        .imc-valor {
-            font-size: 36px;
-            font-weight: bold;
-            text-align: center;
-            margin: 10px 0;
-        }
+    .acciones-botones {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
 
-        .imc-clasificacion {
-            text-align: center;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
+    .celda-observacion {
+      min-width: 150px;
+      max-width: 250px;
+    }
 
-        .imc-tabla {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 15px 0;
-            justify-content: center;
-        }
+    .celda-dieta {
+      min-width: 120px;
+      max-width: 200px;
+    }
 
-        .imc-categoria {
-            flex: 1;
-            min-width: 70px;
-            padding: 6px 4px;
-            text-align: center;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            background: #edf2f7;
-        }
+    .edit-input-obs {
+      width: 100%;
+      min-width: 120px;
+      padding: 4px 6px;
+      border: 2px solid #4299e1;
+      border-radius: 6px;
+      font-size: 13px;
+      background: #fffff0;
+    }
+    .edit-input-obs:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
 
-        .imc-categoria.activa {
-            transform: scale(1.02);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+    .edit-input-dieta {
+      width: 100%;
+      min-width: 100px;
+      padding: 4px 6px;
+      border: 2px solid #4299e1;
+      border-radius: 6px;
+      font-size: 13px;
+      background: #fffff0;
+    }
+    .edit-input-dieta:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
 
-        .error {
-            background: #fed7d7;
-            color: #c53030;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: center;
-            display: none;
-        }
+    .tag-dieta {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tag-dieta.hipocalorica {
+      background: #fef5e7;
+      color: #d69e2e;
+    }
+    .tag-dieta.normocalorica {
+      background: #e8f5e9;
+      color: #38a169;
+    }
+    .tag-dieta.hipercalorica {
+      background: #e3f2fd;
+      color: #3182ce;
+    }
+    .tag-dieta.keto {
+      background: #f3e5f5;
+      color: #7b2fbe;
+    }
+    .tag-dieta.vegetariana {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    .tag-dieta.sin_gluten {
+      background: #fff3e0;
+      color: #e65100;
+    }
+    .tag-dieta.diabetica {
+      background: #ffebee;
+      color: #c62828;
+    }
+    .tag-dieta.renal {
+      background: #e0f7fa;
+      color: #00838f;
+    }
+    .tag-dieta.soft {
+      background: #fce4ec;
+      color: #ad1457;
+    }
 
-        .error.show {
-            display: block;
-        }
-
-        .footer {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 12px;
-            color: #a0aec0;
-        }
-    </style>
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      .pesos-extra {
+        grid-template-columns: 1fr 1fr;
+      }
+      .tabs {
+        flex-direction: column;
+        gap: 5px;
+      }
+      .tab-btn {
+        text-align: center;
+      }
+      #tablaPacientes {
+        font-size: 12px;
+      }
+      #tablaPacientes th,
+      #tablaPacientes td {
+        padding: 6px 4px;
+      }
+      .btn-editar,
+      .btn-eliminar,
+      .btn-guardar-edicion,
+      .btn-cancelar-edicion {
+        font-size: 11px;
+        padding: 3px 8px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>⚕️ Calculadora para Nely</h1>
-        <div class="subtitle">Edad exacta + Índice de Masa Corporal</div>
+  <div class="container">
+    <h1>⚕️ Calculadora para Nely</h1>
+    <div class="subtitle">Edad exacta + IMC + Gestión de pacientes</div>
 
-        <!-- SECCIÓN EDAD -->
-        <div class="input-group">
-            <label>📅 Fecha de nacimiento (DD/MM/AAAA)</label>
-            <div class="fecha-manual">
-                <input type="text" id="dia" placeholder="Día" maxlength="2" size="2">
-                <input type="text" id="mes" placeholder="Mes" maxlength="2" size="2">
-                <input type="text" id="anio" placeholder="Año" maxlength="4" size="4">
-            </div>
-        </div>
-
-        <button onclick="calcularEdadManual()">Calcular Edad Exacta</button>
-
-        <div id="resultadoEdad" class="resultado"></div>
-
-        <!-- DIVISOR VISUAL -->
-        <div class="divider">
-            <span>➕</span>
-        </div>
-
-        <!-- SECCIÓN IMC -->
-        <div class="input-group">
-            <label>⚖️ Calculadora de IMC</label>
-            <div class="imc-campos">
-                <input type="number" id="peso" step="0.1" placeholder="Peso (kg)" value="">
-                <input type="number" id="altura" step="0.01" placeholder="Altura (m)" value="">
-            </div>
-        </div>
-
-        <button class="btn-imc" onclick="calcularIMC()">Calcular IMC</button>
-
-        <div id="resultadoIMC" class="resultado"></div>
-        <div id="error" class="error"></div>
-        
-        <div class="footer">
-            Lo estas haciendo muy bien te amo.
-        </div>
+    <!-- ===== PESTAÑAS ===== -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-calc">📊 Calculadora</button>
+      <button class="tab-btn" data-tab="tab-pacientes">🛏️ Pacientes</button>
     </div>
 
-    <script>
-        // Auto-format: pasar al siguiente campo automáticamente en la fecha
-        document.getElementById('dia').addEventListener('input', function(e) {
-            if(this.value.length === 2) document.getElementById('mes').focus();
-        });
-        
-        document.getElementById('mes').addEventListener('input', function(e) {
-            if(this.value.length === 2) document.getElementById('anio').focus();
-        });
+    <!-- ===== CONTENIDO PESTAÑA 1: CALCULADORA ===== -->
+    <div class="tab-content" id="tab-calc">
+      <!-- SECCIÓN EDAD -->
+      <div class="input-group">
+        <label>📅 Fecha de nacimiento (DD/MM/AAAA)</label>
+        <div class="fecha-manual">
+          <input type="text" id="dia" placeholder="Día" maxlength="2" size="2" />
+          <input type="text" id="mes" placeholder="Mes" maxlength="2" size="2" />
+          <input type="text" id="anio" placeholder="Año" maxlength="4" size="4" />
+        </div>
+      </div>
+      <button onclick="calcularEdadManual()">Calcular Edad Exacta</button>
+      <div id="resultadoEdad" class="resultado"></div>
 
-        // ===================== CÁLCULO DE EDAD =====================
-        function calcularEdadManual() {
-            const dia = document.getElementById('dia').value;
-            const mes = document.getElementById('mes').value;
-            const anio = document.getElementById('anio').value;
-            
-            const resultadoDiv = document.getElementById('resultadoEdad');
-            const errorDiv = document.getElementById('error');
-            
-            resultadoDiv.classList.remove('show');
-            errorDiv.classList.remove('show');
-            
-            // Validaciones
-            if(!dia || !mes || !anio) {
-                mostrarError('Completa día, mes y año');
-                return;
-            }
-            
-            const diaNum = parseInt(dia);
-            const mesNum = parseInt(mes);
-            const anioNum = parseInt(anio);
-            
-            if(diaNum < 1 || diaNum > 31) {
-                mostrarError('Día inválido (1-31)');
-                return;
-            }
-            
-            if(mesNum < 1 || mesNum > 12) {
-                mostrarError('Mes inválido (1-12)');
-                return;
-            }
-            
-            if(anioNum < 1900 || anioNum > new Date().getFullYear()) {
-                mostrarError('Año inválido (1900-actual)');
-                return;
-            }
-            
-            const fechaNac = new Date(anioNum, mesNum - 1, diaNum);
-            const hoy = new Date();
-            
-            // Validar fecha real
-            if(fechaNac.getDate() !== diaNum || fechaNac.getMonth() !== mesNum - 1) {
-                mostrarError('Fecha inválida (ej: 31/02 no existe)');
-                return;
-            }
-            
-            if(fechaNac > hoy) {
-                mostrarError('La fecha no puede ser futura');
-                return;
-            }
-            
-            // Cálculo de edad exacta
-            let años = hoy.getFullYear() - fechaNac.getFullYear();
-            let meses = hoy.getMonth() - fechaNac.getMonth();
-            let dias = hoy.getDate() - fechaNac.getDate();
-            
-            if(dias < 0) {
-                meses--;
-                const ultimoDiaMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth(), 0).getDate();
-                dias += ultimoDiaMesAnterior;
-            }
-            
-            if(meses < 0) {
-                años--;
-                meses += 12;
-            }
-            
-            const mesesTotales = años * 12 + meses;
-            const fechaCalculo = `${hoy.getDate().toString().padStart(2, '0')}/${(hoy.getMonth() + 1).toString().padStart(2, '0')}/${hoy.getFullYear()}`;
-            
-            // Recomendación nutricional según edad (con más detalle)
-            let recomendacion = '';
-            let colorRecomendacion = '';
-            
-            if(años < 2) {
-                recomendacion = '👶 **Lactante** - Control cada mes. Evaluar percentiles de peso/talla. Leche materna o fórmula como base.';
-                colorRecomendacion = '#fef5e7';
-            } else if(años < 12) {
-                recomendacion = '🧒 **Infancia** - Evaluar cada 3 meses. Proteínas: 1.2-1.5 g/kg/día. Vigilar curva de crecimiento.';
-                colorRecomendacion = '#e8f5e9';
-            } else if(años < 18) {
-                recomendacion = '🧑 **Adolescencia** - Aumento de requerimientos. Calcio: 1300 mg/día. Hierro: 11-15 mg/día según sexo.';
-                colorRecomendacion = '#e3f2fd';
-            } else if(años < 60) {
-                recomendacion = '👨‍⚕️ **Adulto** - Proteínas: 0.8-1.0 g/kg/día. Evaluar composición corporal cada año.';
-                colorRecomendacion = '#f3e5f5';
-            } else {
-                recomendacion = '👴 **Adulto mayor** - Prevenir sarcopenia. Proteínas: 1.2-1.5 g/kg/día. Vitamina D y calcio.';
-                colorRecomendacion = '#ffebee';
-            }
-            
-            resultadoDiv.innerHTML = `
-                <div class="edad-principal">
-                    <div class="edad-anos">
-                        ${años} <span>años</span>
-                    </div>
-                    <div class="edad-meses">
-                        ${meses} mes${meses !== 1 ? 'es' : ''} completos
-                        ${dias > 0 ? ` + ${dias} día${dias !== 1 ? 's' : ''}` : ''}
-                    </div>
-                </div>
-                
-                <div class="info-adicional">
-                    <div class="info-item">
-                        <span class="info-label">📊 Meses de vida totales:</span>
-                        <span class="info-value">${mesesTotales} meses</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">📅 Fecha de cálculo:</span>
-                        <span class="info-value">${fechaCalculo}</span>
-                    </div>
-                </div>
+      <div class="divider"><span>➕</span></div>
 
-                <div class="recomendacion" style="background: ${colorRecomendacion}">
-                    <strong>🔬 Nota nutricionista:</strong><br>
-                    ${recomendacion}
-                </div>
-            `;
-            
-            resultadoDiv.classList.add('show');
-        }
-        
-        // ===================== CÁLCULO IMC =====================
-        function calcularIMC() {
-            const pesoInput = document.getElementById('peso').value;
-            const alturaInput = document.getElementById('altura').value;
-            const resultadoIMCDiv = document.getElementById('resultadoIMC');
-            const errorDiv = document.getElementById('error');
-            
-            // Ocultar resultados previos
-            resultadoIMCDiv.classList.remove('show');
-            errorDiv.classList.remove('show');
-            
-            // Validaciones
-            if(pesoInput === '' || alturaInput === '') {
-                mostrarError('Ingresa peso y altura para calcular IMC');
-                return;
-            }
-            
-            const peso = parseFloat(pesoInput);
-            const altura = parseFloat(alturaInput);
-            
-            if(isNaN(peso) || isNaN(altura)) {
-                mostrarError('Valores no válidos');
-                return;
-            }
-            
-            if(peso <= 0 || peso > 500) {
-                mostrarError('Peso inválido (entre 1 y 500 kg)');
-                return;
-            }
-            
-            if(altura <= 0 || altura > 2.8) {
-                mostrarError('Altura inválida (entre 0.5 y 2.8 m)');
-                return;
-            }
-            
-            // Calcular IMC
-            const imc = peso / (altura * altura);
-            const imcRedondeado = imc.toFixed(1);
-            
-            // Determinar clasificación y consejo
-            let clasificacion = '';
-            let colorClasificacion = '';
-            let consejoNutricional = '';
-            let rangoPesoIdeal = '';
-            
-            // Clasificación OMS
-            if(imc < 18.5) {
-                clasificacion = 'Bajo peso';
-                colorClasificacion = '#fef5e7';
-                consejoNutricional = '🍎 Se recomienda aumentar peso de forma saludable: incorporar frutos secos, aguacate, proteínas magras y realizar entrenamiento de fuerza.';
-                rangoPesoIdeal = `Para llegar a un IMC normal (18.5-24.9), deberías aumentar aprox. ${((18.5 * altura * altura) - peso).toFixed(1)} - ${((24.9 * altura * altura) - peso).toFixed(1)} kg.`;
-            } 
-            else if(imc >= 18.5 && imc < 25) {
-                clasificacion = 'Peso normal ✅';
-                colorClasificacion = '#e8f5e9';
-                consejoNutricional = '🥗 ¡Excelente! Mantén hábitos saludables: dieta equilibrada, actividad física regular y chequeos periódicos.';
-                rangoPesoIdeal = 'Tu peso está dentro del rango saludable. Sigue así.';
-            }
-            else if(imc >= 25 && imc < 30) {
-                clasificacion = 'Sobrepeso';
-                colorClasificacion = '#fff3e0';
-                consejoNutricional = '🏃‍♂️ Se recomienda reducir entre 5-10% del peso actual. Priorizar vegetales, proteínas magras, reducir azúcares y aumentar actividad física.';
-                rangoPesoIdeal = `Para un IMC normal, tu peso ideal estaría entre ${(18.5 * altura * altura).toFixed(1)} kg y ${(24.9 * altura * altura).toFixed(1)} kg.`;
-            }
-            else if(imc >= 30 && imc < 35) {
-                clasificacion = 'Obesidad tipo I';
-                colorClasificacion = '#ffebee';
-                consejoNutricional = '⚠️ Es importante acudir con nutricionista. Disminuir calorías gradualmente (500 kcal/día), aumentar fibra y realizar ejercicio aeróbico 150 min/semana.';
-                rangoPesoIdeal = `Sugerencia de peso saludable: ${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg.`;
-            }
-            else if(imc >= 35 && imc < 40) {
-                clasificacion = 'Obesidad tipo II';
-                colorClasificacion = '#ffcdd2';
-                consejoNutricional = '🩺 Obesidad severa. Requiere evaluación médica y nutricional personalizada. Priorizar cambios conductuales y supervisión profesional.';
-                rangoPesoIdeal = `Meta sugerida: reducir al menos un 10% del peso actual. Rango saludable: ${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg.`;
-            }
-            else {
-                clasificacion = 'Obesidad tipo III (mórbida)';
-                colorClasificacion = '#ef9a9a';
-                consejoNutricional = '🚨 Atención prioritaria. Tratamiento multidisciplinario urgente: nutrición, endocrinología y actividad física adaptada.';
-                rangoPesoIdeal = `Objetivo a largo plazo alcanzar rango de ${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg con acompañamiento profesional.`;
-            }
-            
-            // Determinar color de fondo dinámico para el valor de IMC
-            let colorIMC = '';
-            if(imc < 18.5) colorIMC = '#f6ad55';
-            else if(imc < 25) colorIMC = '#68d391';
-            else if(imc < 30) colorIMC = '#fbd38d';
-            else colorIMC = '#fc8181';
-            
-            // Construir tabla visual de categorías IMC
-            const categorias = [
-                { nombre: 'Bajo peso', min: 0, max: 18.4 },
-                { nombre: 'Normal', min: 18.5, max: 24.9 },
-                { nombre: 'Sobrepeso', min: 25, max: 29.9 },
-                { nombre: 'Obesidad I', min: 30, max: 34.9 },
-                { nombre: 'Obesidad II', min: 35, max: 39.9 },
-                { nombre: 'Obesidad III', min: 40, max: 100 }
-            ];
-            
-            let tablaHTML = '<div class="imc-tabla">';
-            categorias.forEach(cat => {
-                let activa = (imc >= cat.min && imc <= cat.max);
-                let colorFondo = '#edf2f7';
-                if(activa) {
-                    if(cat.nombre === 'Bajo peso') colorFondo = '#f6ad55';
-                    else if(cat.nombre === 'Normal') colorFondo = '#68d391';
-                    else if(cat.nombre === 'Sobrepeso') colorFondo = '#fbd38d';
-                    else colorFondo = '#fc8181';
-                }
-                tablaHTML += `<div class="imc-categoria" style="background: ${colorFondo}; ${activa ? 'border: 2px solid #2d3748; font-weight: bold;' : ''}">${cat.nombre}<br><small>${cat.min}-${cat.max}</small></div>`;
-            });
-            tablaHTML += '</div>';
-            
-            resultadoIMCDiv.innerHTML = `
-                <div style="text-align: center;">
-                    <div class="imc-valor" style="color: ${colorIMC};">${imcRedondeado}</div>
-                    <div class="imc-clasificacion" style="color: #2d3748;">${clasificacion}</div>
-                </div>
-                
-                ${tablaHTML}
-                
-                <div class="info-adicional" style="margin-top: 5px;">
-                    <div class="info-item">
-                        <span class="info-label">⚖️ Peso ingresado:</span>
-                        <span class="info-value">${peso} kg</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">📏 Altura:</span>
-                        <span class="info-value">${altura} m</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">🎯 Rango saludable:</span>
-                        <span class="info-value">${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg</span>
-                    </div>
-                </div>
+      <!-- SECCIÓN IMC + PESOS IDEALES -->
+      <div class="input-group">
+        <label>⚖️ Calculadora de IMC</label>
+        <div class="sexo-group">
+          <label><input type="radio" name="sexo" value="hombre" /> 👨 Hombre</label>
+          <label><input type="radio" name="sexo" value="mujer" /> 👩 Mujer</label>
+        </div>
+        <div class="imc-campos" style="margin-top:10px;">
+          <input type="number" id="peso" step="0.1" placeholder="Peso (kg)" />
+          <input type="number" id="altura" step="0.01" placeholder="Altura (m)" />
+        </div>
+      </div>
+      <button class="btn-imc" onclick="calcularIMC()">Calcular IMC y pesos</button>
+      <div id="resultadoIMC" class="resultado"></div>
 
-                <div class="recomendacion" style="background: ${colorClasificacion}; border-left-color: #2c5282;">
-                    <strong>📌 Consejo nutricional:</strong><br>
-                    ${consejoNutricional}<br><br>
-                    <small>📊 ${rangoPesoIdeal}</small>
-                </div>
-                
-                <div style="margin-top: 12px; font-size: 12px; color: #718096; text-align: center;">
-                    Basado en criterios OMS · Consulta siempre a un especialista
-                </div>
-            `;
-            
-            resultadoIMCDiv.classList.add('show');
+      <div id="error" class="error"></div>
+      <div class="footer">Lo estas haciendo muy bien te amo.</div>
+    </div>
+
+    <!-- ===== CONTENIDO PESTAÑA 2: PACIENTES ===== -->
+    <div class="tab-content" id="tab-pacientes" style="display:none;">
+      <h2 style="color:#2d3748; margin-bottom:15px;">📋 Lista de pacientes</h2>
+
+      <!-- Formulario agregar -->
+      <div class="input-group">
+        <label>➕ Agregar paciente</label>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <input type="number" id="cama" placeholder="N° cama" style="flex:0.6; min-width:70px; padding:10px; border:2px solid #e2e8f0; border-radius:10px;" />
+          <input type="text" id="nombre" placeholder="Nombre" style="flex:1.2; min-width:100px; padding:10px; border:2px solid #e2e8f0; border-radius:10px;" />
+          <input type="text" id="diagnostico" placeholder="Diagnóstico" style="flex:1.2; min-width:100px; padding:10px; border:2px solid #e2e8f0; border-radius:10px;" />
+          <input type="text" id="dieta" placeholder="🥗 Dieta (ej: Hipocalórica)" style="flex:1; min-width:100px; padding:10px; border:2px solid #e2e8f0; border-radius:10px;" />
+          <input type="text" id="observaciones" placeholder="📝 Observaciones" style="flex:1.5; min-width:120px; padding:10px; border:2px solid #e2e8f0; border-radius:10px;" />
+          <button class="btn-agregar" onclick="agregarPaciente()">Agregar</button>
+        </div>
+      </div>
+
+      <!-- Buscador -->
+      <div class="input-group" style="margin-top:20px;">
+        <label>🔍 Buscar por cama</label>
+        <div class="campo-filtro">
+          <input type="number" id="buscarCama" placeholder="N° de cama" />
+          <button class="btn-buscar" onclick="buscarPaciente()">Buscar</button>
+          <button class="btn-todos" onclick="mostrarTodos()">Ver todos</button>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="tabla-wrapper">
+        <table id="tablaPacientes">
+          <thead>
+            <tr>
+              <th style="width:60px;">🛏️ Cama</th>
+              <th style="min-width:90px;">👤 Nombre</th>
+              <th style="min-width:90px;">📋 Diagnóstico</th>
+              <th style="min-width:100px;">🥗 Dieta</th>
+              <th style="min-width:130px;">📝 Observaciones</th>
+              <th style="text-align:center; width:200px;">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTabla">
+            <tr><td colspan="6" style="text-align:center; padding:20px; color:#a0aec0;">No hay pacientes registrados</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px; font-size:12px; color:#718096; text-align:center;">
+        💾 Los datos se guardan automáticamente en tu navegador.
+      </div>
+    </div>
+  </div>
+
+ <script>
+    // ============================================================
+    // 0. FUNCIÓN DE SEGURIDAD (escape HTML)
+    // ============================================================
+    function escapeHTML(texto) {
+      if (!texto) return '';
+      const div = document.createElement('div');
+      div.textContent = texto;
+      return div.innerHTML;
+    }
+
+    // ============================================================
+    // 1. AUTO-FOCUS EN FECHA
+    // ============================================================
+    document.getElementById('dia').addEventListener('input', function(e) {
+      if (this.value.length === 2) document.getElementById('mes').focus();
+    });
+    document.getElementById('mes').addEventListener('input', function(e) {
+      if (this.value.length === 2) document.getElementById('anio').focus();
+    });
+
+    // ============================================================
+    // 2. CÁLCULO DE EDAD
+    // ============================================================
+    function calcularEdadManual() {
+      const dia = document.getElementById('dia').value;
+      const mes = document.getElementById('mes').value;
+      const anio = document.getElementById('anio').value;
+      const resultadoDiv = document.getElementById('resultadoEdad');
+      const errorDiv = document.getElementById('error');
+
+      resultadoDiv.classList.remove('show');
+      errorDiv.classList.remove('show');
+
+      if (!dia || !mes || !anio) {
+        mostrarError('Completa día, mes y año');
+        return;
+      }
+      const diaNum = parseInt(dia);
+      const mesNum = parseInt(mes);
+      const anioNum = parseInt(anio);
+
+      if (diaNum < 1 || diaNum > 31) { mostrarError('Día inválido (1‑31)'); return; }
+      if (mesNum < 1 || mesNum > 12) { mostrarError('Mes inválido (1‑12)'); return; }
+      if (anioNum < 1900 || anioNum > new Date().getFullYear()) {
+        mostrarError('Año inválido (1900‑actual)');
+        return;
+      }
+
+      const fechaNac = new Date(anioNum, mesNum - 1, diaNum);
+      const hoy = new Date();
+
+      if (fechaNac.getDate() !== diaNum || fechaNac.getMonth() !== mesNum - 1) {
+        mostrarError('Fecha inválida (ej: 31/02 no existe)');
+        return;
+      }
+      if (fechaNac > hoy) {
+        mostrarError('La fecha no puede ser futura');
+        return;
+      }
+
+      let años = hoy.getFullYear() - fechaNac.getFullYear();
+      let meses = hoy.getMonth() - fechaNac.getMonth();
+      let dias = hoy.getDate() - fechaNac.getDate();
+
+      if (dias < 0) {
+        meses--;
+        const ultimoDiaMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth(), 0).getDate();
+        dias += ultimoDiaMesAnterior;
+      }
+      if (meses < 0) {
+        años--;
+        meses += 12;
+      }
+
+      const mesesTotales = años * 12 + meses;
+      const fechaCalculo =
+        `${hoy.getDate().toString().padStart(2, '0')}/${(hoy.getMonth() + 1).toString().padStart(2, '0')}/${hoy.getFullYear()}`;
+
+      let recomendacion = '';
+      let colorRecomendacion = '';
+      if (años < 2) {
+        recomendacion = '👶 **Lactante** - Control cada mes. Evaluar percentiles de peso/talla. Leche materna o fórmula como base.';
+        colorRecomendacion = '#fef5e7';
+      } else if (años < 12) {
+        recomendacion = '🧒 **Infancia** - Evaluar cada 3 meses. Proteínas: 1.2‑1.5 g/kg/día. Vigilar curva de crecimiento.';
+        colorRecomendacion = '#e8f5e9';
+      } else if (años < 18) {
+        recomendacion = '🧑 **Adolescencia** - Aumento de requerimientos. Calcio: 1300 mg/día. Hierro: 11‑15 mg/día según sexo.';
+        colorRecomendacion = '#e3f2fd';
+      } else if (años < 60) {
+        recomendacion = '👨‍⚕️ **Adulto** - Proteínas: 0.8‑1.0 g/kg/día. Evaluar composición corporal cada año.';
+        colorRecomendacion = '#f3e5f5';
+      } else {
+        recomendacion = '👴 **Adulto mayor** - Prevenir sarcopenia. Proteínas: 1.2‑1.5 g/kg/día. Vitamina D y calcio.';
+        colorRecomendacion = '#ffebee';
+      }
+
+      resultadoDiv.innerHTML = `
+        <div class="edad-principal">
+          <div class="edad-anos"> ${años} <span>años</span> </div>
+          <div class="edad-meses">
+            ${meses} mes${meses !== 1 ? 'es' : ''} completos
+            ${dias > 0 ? ` + ${dias} día${dias !== 1 ? 's' : ''}` : ''}
+          </div>
+        </div>
+        <div class="info-adicional">
+          <div class="info-item">
+            <span class="info-label">📊 Meses de vida totales:</span>
+            <span class="info-value">${mesesTotales} meses</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">📅 Fecha de cálculo:</span>
+            <span class="info-value">${fechaCalculo}</span>
+          </div>
+        </div>
+        <div class="recomendacion" style="background: ${colorRecomendacion}">
+          <strong>🔬 Nota nutricionista:</strong><br> ${recomendacion}
+        </div>
+      `;
+      resultadoDiv.classList.add('show');
+    }
+
+    // ============================================================
+    // 3. CÁLCULO IMC + PESOS IDEALES
+    // ============================================================
+    function calcularIMC() {
+      const pesoInput = document.getElementById('peso').value;
+      const alturaInput = document.getElementById('altura').value;
+      const resultadoDiv = document.getElementById('resultadoIMC');
+      const errorDiv = document.getElementById('error');
+
+      const sexoRadio = document.querySelector('input[name="sexo"]:checked');
+      const sexo = sexoRadio ? sexoRadio.value : null;
+
+      resultadoDiv.classList.remove('show');
+      errorDiv.classList.remove('show');
+
+      if (pesoInput === '' || alturaInput === '') {
+        mostrarError('Ingresa peso y altura para calcular IMC');
+        return;
+      }
+      const peso = parseFloat(pesoInput);
+      const altura = parseFloat(alturaInput);
+      if (isNaN(peso) || isNaN(altura)) {
+        mostrarError('Valores no válidos');
+        return;
+      }
+      if (peso <= 0 || peso > 500) {
+        mostrarError('Peso inválido (entre 1 y 500 kg)');
+        return;
+      }
+      if (altura <= 0 || altura > 2.8) {
+        mostrarError('Altura inválida (entre 0.5 y 2.8 m)');
+        return;
+      }
+      if (!sexo) {
+        mostrarError('Selecciona tu sexo (Hombre / Mujer) para calcular los pesos ideales');
+        return;
+      }
+
+      // ---- IMC ----
+      const imc = peso / (altura * altura);
+      const imcRedondeado = imc.toFixed(1);
+
+      // ---- Clasificación ----
+      let clasificacion = '',
+        colorClasificacion = '',
+        consejoNutricional = '',
+        rangoPesoIdeal = '';
+      if (imc < 18.5) {
+        clasificacion = 'Bajo peso';
+        colorClasificacion = '#fef5e7';
+        consejoNutricional = '🍎 Se recomienda aumentar peso de forma saludable: incorporar frutos secos, aguacate, proteínas magras y realizar entrenamiento de fuerza.';
+        rangoPesoIdeal = `Para llegar a un IMC normal (18.5‑24.9), deberías aumentar aprox. ${((18.5 * altura * altura) - peso).toFixed(1)} - ${((24.9 * altura * altura) - peso).toFixed(1)} kg.`;
+      } else if (imc >= 18.5 && imc < 25) {
+        clasificacion = 'Peso normal ✅';
+        colorClasificacion = '#e8f5e9';
+        consejoNutricional = '🥗 ¡Excelente! Mantén hábitos saludables: dieta equilibrada, actividad física regular y chequeos periódicos.';
+        rangoPesoIdeal = 'Tu peso está dentro del rango saludable. Sigue así.';
+      } else if (imc >= 25 && imc < 30) {
+        clasificacion = 'Sobrepeso';
+        colorClasificacion = '#fff3e0';
+        consejoNutricional = '🏃‍♂️ Se recomienda reducir entre 5‑10% del peso actual. Priorizar vegetales, proteínas magras, reducir azúcares y aumentar actividad física.';
+        rangoPesoIdeal = `Para un IMC normal, tu peso ideal estaría entre ${(18.5 * altura * altura).toFixed(1)} kg y ${(24.9 * altura * altura).toFixed(1)} kg.`;
+      } else if (imc >= 30 && imc < 35) {
+        clasificacion = 'Obesidad tipo I';
+        colorClasificacion = '#ffebee';
+        consejoNutricional = '⚠️ Es importante acudir con nutricionista. Disminuir calorías gradualmente (500 kcal/día), aumentar fibra y realizar ejercicio aeróbico 150 min/semana.';
+        rangoPesoIdeal = `Sugerencia de peso saludable: ${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg.`;
+      } else if (imc >= 35 && imc < 40) {
+        clasificacion = 'Obesidad tipo II';
+        colorClasificacion = '#ffcdd2';
+        consejoNutricional = '🩺 Obesidad severa. Requiere evaluación médica y nutricional personalizada. Priorizar cambios conductuales y supervisión profesional.';
+        rangoPesoIdeal = `Meta sugerida: reducir al menos un 10% del peso actual. Rango saludable: ${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg.`;
+      } else {
+        clasificacion = 'Obesidad tipo III (mórbida)';
+        colorClasificacion = '#ef9a9a';
+        consejoNutricional = '🚨 Atención prioritaria. Tratamiento multidisciplinario urgente: nutrición, endocrinología y actividad física adaptada.';
+        rangoPesoIdeal = `Objetivo a largo plazo alcanzar rango de ${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg con acompañamiento profesional.`;
+      }
+
+      let colorIMC = '';
+      if (imc < 18.5) colorIMC = '#f6ad55';
+      else if (imc < 25) colorIMC = '#68d391';
+      else if (imc < 30) colorIMC = '#fbd38d';
+      else colorIMC = '#fc8181';
+
+      // ---- Tabla IMC ----
+      const categorias = [
+        { nombre: 'Bajo peso', min: 0, max: 18.4 },
+        { nombre: 'Normal', min: 18.5, max: 24.9 },
+        { nombre: 'Sobrepeso', min: 25, max: 29.9 },
+        { nombre: 'Obesidad I', min: 30, max: 34.9 },
+        { nombre: 'Obesidad II', min: 35, max: 39.9 },
+        { nombre: 'Obesidad III', min: 40, max: 100 }
+      ];
+      let tablaHTML = '<div class="imc-tabla">';
+      categorias.forEach(cat => {
+        let activa = (imc >= cat.min && imc <= cat.max);
+        let colorFondo = '#edf2f7';
+        if (activa) {
+          if (cat.nombre === 'Bajo peso') colorFondo = '#f6ad55';
+          else if (cat.nombre === 'Normal') colorFondo = '#68d391';
+          else if (cat.nombre === 'Sobrepeso') colorFondo = '#fbd38d';
+          else colorFondo = '#fc8181';
         }
-        
-        function mostrarError(mensaje) {
-            const errorDiv = document.getElementById('error');
-            errorDiv.innerHTML = mensaje;
-            errorDiv.classList.add('show');
-            setTimeout(() => errorDiv.classList.remove('show'), 3500);
+        tablaHTML += `<div class="imc-categoria" style="background: ${colorFondo}; ${activa ? 'border: 2px solid #2d3748; font-weight: bold;' : ''}">${cat.nombre}<br><small>${cat.min}-${cat.max}</small></div>`;
+      });
+      tablaHTML += '</div>';
+
+      // ---- Pesos ideales ----
+      const factorWest = (sexo === 'hombre') ? 22.4 : 20.9;
+      const pesoIdealWest = altura * altura * factorWest;
+      const tallaCm = altura * 100;
+      const factorBroca = (sexo === 'hombre') ? 100 : 105;
+      const pesoIdealBroca = tallaCm - factorBroca;
+      const pesoCorregidoWilkens = pesoIdealWest + (peso - pesoIdealWest) * 0.25;
+
+      const tarjetasHTML = `
+        <div class="pesos-extra">
+          <div class="peso-card west">
+            <div class="label">⚖️ West (ideal)</div>
+            <div class="value">${pesoIdealWest.toFixed(1)} kg</div>
+            <div class="sub">${sexo === 'hombre' ? '×22.4' : '×20.9'}</div>
+          </div>
+          <div class="peso-card broca">
+            <div class="label">📐 Broca (rápido)</div>
+            <div class="value">${pesoIdealBroca.toFixed(1)} kg</div>
+            <div class="sub">talla(cm) − ${factorBroca}</div>
+          </div>
+          <div class="peso-card wilkens">
+            <div class="label">🔄 Wilkens (corregido)</div>
+            <div class="value">${pesoCorregidoWilkens.toFixed(1)} kg</div>
+            <div class="sub">West + (actual − West)×0.25</div>
+          </div>
+        </div>
+      `;
+
+      // ---- Mostrar todo ----
+      resultadoDiv.innerHTML = `
+        <div style="text-align: center;">
+          <div class="imc-valor" style="color: ${colorIMC};">${imcRedondeado}</div>
+          <div class="imc-clasificacion" style="color: #2d3748;">${clasificacion}</div>
+        </div>
+        ${tablaHTML}
+        <div class="info-adicional" style="margin-top: 5px;">
+          <div class="info-item"><span class="info-label">⚖️ Peso ingresado:</span><span class="info-value">${peso} kg</span></div>
+          <div class="info-item"><span class="info-label">📏 Altura:</span><span class="info-value">${altura} m</span></div>
+          <div class="info-item"><span class="info-label">🎯 Rango saludable:</span><span class="info-value">${(18.5 * altura * altura).toFixed(1)} - ${(24.9 * altura * altura).toFixed(1)} kg</span></div>
+        </div>
+        <div class="recomendacion" style="background: ${colorClasificacion}; border-left-color: #2c5282;">
+          <strong>📌 Consejo nutricional:</strong><br> ${consejoNutricional}<br><br>
+          <small>📊 ${rangoPesoIdeal}</small>
+        </div>
+        ${tarjetasHTML}
+        <div style="margin-top: 12px; font-size: 12px; color: #718096; text-align: center;">
+          Basado en criterios OMS · West, Broca (IIDENUT) y Wilkens · Consulta siempre a un especialista
+        </div>
+      `;
+      resultadoDiv.classList.add('show');
+    }
+
+    // ============================================================
+    // 4. MOSTRAR ERROR
+    // ============================================================
+    function mostrarError(mensaje) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.innerHTML = mensaje;
+      errorDiv.classList.add('show');
+      setTimeout(() => errorDiv.classList.remove('show'), 3500);
+    }
+
+    // ============================================================
+    // 5. ENTER PARA CALCULAR
+    // ============================================================
+    document.getElementById('peso').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') calcularIMC();
+    });
+    document.getElementById('altura').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') calcularIMC();
+    });
+    document.getElementById('anio').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') calcularEdadManual();
+    });
+
+    // ============================================================
+    // 6. PESTAÑAS
+    // ============================================================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        const tabId = this.dataset.tab;
+        document.getElementById(tabId).style.display = 'block';
+      });
+    });
+
+    // ============================================================
+    // 7. GESTIÓN DE PACIENTES (con localStorage)
+    // ============================================================
+    let pacientes = [];
+    let filaEditando = null;
+
+    // ============================================================
+    // FUNCIÓN MEJORADA: Detecta cualquier tipo de dieta
+    // ============================================================
+    function getDietaTag(dieta) {
+      if (!dieta || dieta.trim() === '') return '';
+      
+      const dietaLower = dieta.toLowerCase().trim();
+      
+      // Lista de palabras clave para cada tipo de dieta
+      const tipos = {
+        hipocalorica: ['hipocalórica', 'hipocalorica', 'baja en calorías', 'baja calorias', 'deficit'],
+        normocalorica: ['normocalórica', 'normocalorica', 'mantenimiento', 'equilibrada'],
+        hipercalorica: ['hipercalórica', 'hipercalorica', 'alta en calorías', 'alta calorias', 'superavit', 'ganar peso'],
+        keto: ['keto', 'cetogénica', 'cetogenica', 'cetogénico', 'cetogenico'],
+        vegetariana: ['vegetariana', 'vegetariano', 'ovo-lacto', 'ovo lacto'],
+        sin_gluten: ['sin gluten', 'celíaco', 'celiaco', 'gluten free'],
+        diabetica: ['diabética', 'diabetica', 'diabetes', 'control glucosa', 'bajo índice glucémico'],
+        renal: ['renal', 'insuficiencia renal', 'bajo potasio', 'bajo fósforo'],
+        soft: ['blanda', 'soft', 'pastosa', 'semilíquida', 'semiliquida', 'triturar']
+      };
+
+      // Buscar coincidencia
+      for (const [tipo, keywords] of Object.entries(tipos)) {
+        for (const kw of keywords) {
+          if (dietaLower.includes(kw)) {
+            return tipo;
+          }
         }
+      }
+      
+      // Si no coincide con ninguna categoría, devolvemos '' para que se muestre como texto plano
+      return '';
+    }
+
+    function cargarPacientes() {
+      const data = localStorage.getItem('pacientes');
+      if (data) {
+        try {
+          pacientes = JSON.parse(data);
+        } catch (e) {
+          pacientes = [];
+        }
+      } else {
+        pacientes = [
+          { cama: 101, nombre: 'Ana Pérez', diagnostico: 'Neumonía', dieta: 'Hipocalórica', observaciones: 'Alergia a penicilina. Pendiente de cultivo.' },
+          { cama: 102, nombre: 'Luis Gómez', diagnostico: 'Fractura de cadera', dieta: 'Hipercalórica', observaciones: 'Requiere silla de ruedas. Fisioterapia iniciada.' },
+          { cama: 103, nombre: 'María López', diagnostico: 'Diabetes tipo 2', dieta: 'Diabética', observaciones: 'Control glucosa cada 4h. Insulina NPH 10UI.' },
+          { cama: 104, nombre: 'Carlos Ruiz', diagnostico: 'Insuficiencia renal', dieta: 'Renal', observaciones: 'Restricción de líquidos. K+ < 2g/día.' }
+        ];
+        guardarPacientes();
+      }
+      renderizarTabla(pacientes);
+    }
+
+    function guardarPacientes() {
+      localStorage.setItem('pacientes', JSON.stringify(pacientes));
+    }
+
+    function renderizarTabla(lista) {
+      const tbody = document.getElementById('cuerpoTabla');
+      if (!lista || lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#a0aec0;">No hay pacientes registrados</td></tr>';
+        return;
+      }
+      let html = '';
+      lista.forEach((p, index) => {
+        const realIndex = pacientes.findIndex(item => item.cama === p.cama && item.nombre === p.nombre);
+        const observacionesMostrar = p.observaciones || '';
+        const dietaMostrar = p.dieta || '';
+        const dietaTag = getDietaTag(dietaMostrar);
         
-        // Bonus: Si el usuario presiona Enter mientras está en los campos de IMC también se calcula
-        document.getElementById('peso').addEventListener('keypress', function(e) {
-            if(e.key === 'Enter') calcularIMC();
-        });
-        document.getElementById('altura').addEventListener('keypress', function(e) {
-            if(e.key === 'Enter') calcularIMC();
-        });
-        
-        // También permitir enter en campos fecha
-        document.getElementById('anio').addEventListener('keypress', function(e) {
-            if(e.key === 'Enter') calcularEdadManual();
-        });
-    </script>
+        if (filaEditando === realIndex) {
+          html += `<tr>
+            <td><input type="number" class="edit-input" id="edit-cama-${realIndex}" value="${p.cama}" style="width:60px;" /></td>
+            <td><input type="text" class="edit-input" id="edit-nombre-${realIndex}" value="${escapeHTML(p.nombre)}" /></td>
+            <td><input type="text" class="edit-input" id="edit-diagnostico-${realIndex}" value="${escapeHTML(p.diagnostico)}" /></td>
+            <td class="celda-dieta"><input type="text" class="edit-input-dieta" id="edit-dieta-${realIndex}" value="${escapeHTML(dietaMostrar)}" placeholder="Ej: Hipocalórica" /></td>
+            <td class="celda-observacion"><input type="text" class="edit-input-obs" id="edit-obs-${realIndex}" value="${escapeHTML(observacionesMostrar)}" placeholder="Notas..." /></td>
+            <td style="text-align:center;">
+              <div class="acciones-botones">
+                <button class="btn-guardar-edicion" onclick="guardarEdicion(${realIndex})">💾 Guardar</button>
+                <button class="btn-cancelar-edicion" onclick="cancelarEdicion()">✖ Cancelar</button>
+              </div>
+            </td>
+          </tr>`;
+        } else {
+          // Mostrar la dieta con etiqueta de color o como texto plano
+          let tagHTML;
+          if (dietaTag) {
+            tagHTML = `<span class="tag-dieta ${dietaTag}">${escapeHTML(dietaMostrar)}</span>`;
+          } else if (dietaMostrar) {
+            // Si tiene texto pero no coincide con ninguna categoría, lo mostramos como texto normal
+            tagHTML = `<span style="background:#edf2f7; padding:2px 10px; border-radius:12px; font-size:12px; display:inline-block;">${escapeHTML(dietaMostrar)}</span>`;
+          } else {
+            tagHTML = `<span style="color:#a0aec0; font-style:italic;">Sin dieta</span>`;
+          }
+          
+          html += `<tr>
+            <td>${p.cama}</td>
+            <td>${escapeHTML(p.nombre)}</td>
+            <td>${escapeHTML(p.diagnostico)}</td>
+            <td class="celda-dieta">${tagHTML}</td>
+            <td class="celda-observacion">${escapeHTML(observacionesMostrar) || '<span style="color:#a0aec0; font-style:italic;">Sin observaciones</span>'}</td>
+            <td style="text-align:center;">
+              <div class="acciones-botones">
+                <button class="btn-editar" onclick="iniciarEdicion(${realIndex})">✏️ Editar</button>
+                <button class="btn-eliminar" onclick="eliminarPaciente(${realIndex})">🗑️ Eliminar</button>
+              </div>
+            </td>
+          </tr>`;
+        }
+      });
+      tbody.innerHTML = html;
+    }
+
+    function iniciarEdicion(index) {
+      filaEditando = index;
+      renderizarTabla(pacientes);
+    }
+
+    function guardarEdicion(index) {
+      const cama = parseInt(document.getElementById(`edit-cama-${index}`).value);
+      const nombre = document.getElementById(`edit-nombre-${index}`).value.trim();
+      const diagnostico = document.getElementById(`edit-diagnostico-${index}`).value.trim();
+      const dieta = document.getElementById(`edit-dieta-${index}`).value.trim();
+      const observaciones = document.getElementById(`edit-obs-${index}`).value.trim();
+
+      if (!cama || !nombre || !diagnostico) {
+        alert('Los campos Cama, Nombre y Diagnóstico son obligatorios');
+        return;
+      }
+
+      const camaOcupada = pacientes.some((p, i) => p.cama === cama && i !== index);
+      if (camaOcupada) {
+        alert(`La cama ${cama} ya está ocupada por otro paciente.`);
+        return;
+      }
+
+      pacientes[index] = { cama, nombre, diagnostico, dieta, observaciones };
+      guardarPacientes();
+      filaEditando = null;
+      renderizarTabla(pacientes);
+    }
+
+    function cancelarEdicion() {
+      filaEditando = null;
+      renderizarTabla(pacientes);
+    }
+
+    function agregarPaciente() {
+      const cama = parseInt(document.getElementById('cama').value);
+      const nombre = document.getElementById('nombre').value.trim();
+      const diagnostico = document.getElementById('diagnostico').value.trim();
+      const dieta = document.getElementById('dieta').value.trim();
+      const observaciones = document.getElementById('observaciones').value.trim();
+
+      if (!cama || !nombre || !diagnostico) {
+        alert('Completa los campos obligatorios: cama, nombre y diagnóstico');
+        return;
+      }
+      if (pacientes.some(p => p.cama === cama)) {
+        alert(`La cama ${cama} ya está ocupada.`);
+        return;
+      }
+
+      pacientes.push({ 
+        cama: cama, 
+        nombre: nombre, 
+        diagnostico: diagnostico, 
+        dieta: dieta, 
+        observaciones: observaciones 
+      });
+      
+      guardarPacientes();
+      renderizarTabla(pacientes);
+      
+      // Limpiar campos
+      document.getElementById('cama').value = '';
+      document.getElementById('nombre').value = '';
+      document.getElementById('diagnostico').value = '';
+      document.getElementById('dieta').value = '';
+      document.getElementById('observaciones').value = '';
+    }
+
+    function buscarPaciente() {
+      const numCama = parseInt(document.getElementById('buscarCama').value);
+      if (!numCama) {
+        alert('Ingresa un número de cama válido');
+        return;
+      }
+      const encontrados = pacientes.filter(p => p.cama === numCama);
+      if (encontrados.length === 0) {
+        alert(`No se encontró paciente en la cama ${numCama}`);
+      }
+      filaEditando = null;
+      renderizarTabla(encontrados);
+    }
+
+    function mostrarTodos() {
+      filaEditando = null;
+      renderizarTabla(pacientes);
+      document.getElementById('buscarCama').value = '';
+    }
+
+    function eliminarPaciente(index) {
+      if (index === -1) return;
+      if (confirm(`¿Eliminar a ${pacientes[index].nombre} de la cama ${pacientes[index].cama}?`)) {
+        pacientes.splice(index, 1);
+        guardarPacientes();
+        filaEditando = null;
+        renderizarTabla(pacientes);
+      }
+    }
+
+    // ============================================================
+    // 8. INICIALIZAR
+    // ============================================================
+    cargarPacientes();
+  </script>
 </body>
 </html>
